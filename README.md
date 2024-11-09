@@ -23,7 +23,7 @@ To use this online with several correspondents at the same time, checkout this p
 
 ## Credits
 
-Developed by [AtmanActive](https://github.com/AtmanActive/MIDI-Transport-to-Mute) by butchering the code from [Laurence Dougal Myers](https://github.com/laurence-myers/midi-to-macro), which was, in various forms, based on work by AHK forum members, including (in no particular order):
+Developed by [AtmanActive](https://github.com/AtmanActive/MIDI-Transport-to-Mute) by butchering the code from [MidiToMacro by Laurence Dougal Myers](https://github.com/laurence-myers/midi-to-macro), which was, in various forms, based on work by AHK forum members, including (in no particular order):
 
 - genmce
 - Orbik
