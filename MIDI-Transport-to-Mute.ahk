@@ -30,29 +30,100 @@ DummyNonExistentFunction(*)
 	return false
 }
 
-Main() {
+Main() 
+{
 	global appConfig, currentMidiInputDeviceIndex
-	OnExit(CloseMidiInput)
+	
+	OnExit( CloseMidiInput )
 	
 	TraySetIcon "icon.ico"
-	A_IconTip := "MIDI-Transport-to-Mute"
+	
+	programName := "MIDI-Transport-to-Mute v1.1.0"
+	
+	A_IconTip := programName
+	
+	; Remove all standard menu items
+	A_TrayMenu.Delete()
+	
+	A_TrayMenu.Add( programName, MenuHandlerTitle )
+	A_TrayMenu.Disable( programName )
+	A_TrayMenu.Add() ; Add a menu separator line
 	
 	A_TrayMenu.Add() ; Add a menu separator line
-	A_TrayMenu.Add("Show on Startup", ToggleShowOnStartup)
-	A_TrayMenu.Add("MIDI Monitor", ShowMidiMonitor)
-	A_TrayMenu.Add( "Rename your default audio input device to MicInput", DummyNonExistentFunction )
-	A_TrayMenu.Disable( "Rename your default audio input device to MicInput" )
+	A_TrayMenu.Add( "Open MIDI Monitor", ShowMidiMonitor )
+	A_TrayMenu.Add( "Show MIDI Monitor on Startup", ToggleShowOnStartup )
+	
+	A_TrayMenu.Add() ; Add a menu separator line
+	A_TrayMenu.Add( "Rename your default audio input device to MicInput", MenuHandlerMicRename )
+	
+	A_TrayMenu.Add()  ; Creates a separator line.
+	A_TrayMenu.Add( "Mute Microphone now", MenuHandlerMuteNow )
+	A_TrayMenu.Add( "Unmute Microphone now", MenuHandlerUnMuteNow )
+	
+	A_TrayMenu.Add()  ; Creates a separator line.
+	A_TrayMenu.Add( "About", MenuHandlerAbout )
+	
+	A_TrayMenu.Add()  ; Creates a separator line.
+	A_TrayMenu.Add( "Exit", MenuHandlerExit )
+	
 	ReadConfig()
 	wasMidiOpened := MaybeOpenMidiInput()
-	if (appConfig.showOnStartup) {
-		A_TrayMenu.Check("Show on Startup")
-	} else {
-		A_TrayMenu.Uncheck("Show on Startup")
+	
+	if ( appConfig.showOnStartup ) 
+	{
+		A_TrayMenu.Check( "Show MIDI Monitor on Startup" )
+	} 
+	else 
+	{
+		A_TrayMenu.Uncheck( "Show MIDI Monitor on Startup" )
 	}
 
-	if (!wasMidiOpened || appConfig.showOnStartup) {
+	if ( ! wasMidiOpened || appConfig.showOnStartup ) 
+	{
 		ShowMidiMonitor()
 	}
+	
+	MenuHandlerTitle( ItemName, ItemPos, MyMenu )
+	{
+		
+	}
+	
+	MenuHandlerAbout( ItemName, ItemPos, MyMenu ) 
+	{
+		Result := MsgBox( programName "`n`n`n`nThe purpose of this program is to mute/unmute the windows audio input named MicInput according to incoming MIDI signals for Mackie Stop and Play (A6 & A#6)[093 & 094]{0x5D & 0x5E}. `n`nThis is useful in an online music recording studio session where all participants can be muted on DAW play and unmuted on DAW stop.`n`nDeveloped by AtmanActive, 2024. `n`n`n`nWould you like to open the home page?",, "YesNo")
+		if ( Result = "Yes" )
+		{
+			Run( "https://github.com/AtmanActive/MIDI-Transport-to-Mute" )
+		}
+	}
+	
+	
+	MenuHandlerMicRename( ItemName, ItemPos, MyMenu )
+	{
+		Result := MsgBox( programName "`n`n`n`nThis program expects an audio input device to be titled 'MicInput' in order to be able to control the muted state. Just rename your desired audio input to 'MicInput' in your windows sound control panel.`n`n`n`nWould you like to open the windows sound control panel (takes several seconds to show up)?",, "YesNo")
+		if ( Result = "Yes" )
+		{
+			Run( "mmsys.cpl" )
+		}
+	}
+	
+	
+	
+	MenuHandlerExit( ItemName, ItemPos, MyMenu ) 
+	{
+		ExitApp 0
+	}
+	
+	MenuHandlerMuteNow( ItemName, ItemPos, MyMenu ) 
+	{
+		PerformSoundInputMute()
+	}
+	
+	MenuHandlerUnMuteNow( ItemName, ItemPos, MyMenu ) 
+	{
+		PerformSoundInputUnMute()
+	}
+	
 }
 
 Main()
