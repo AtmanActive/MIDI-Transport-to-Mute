@@ -6,24 +6,37 @@ Persistent()
 #Include lib\Config.ahk
 #Include lib\Gui.ahk
 
-MaybeOpenMidiInput() {
-	global appConfig, currentMidiInputDeviceIndex
+; v1.1.1
 
-	if (
-		appConfig.midiInDevice >= 0
-		; Open the MIDI input, if we don't have a "device name" stored, or if
-		; the stored device name matches the actual device name
-		and (
-			StrLen(appConfig.midiInDeviceName) == 0
-			or GetMidiDeviceName(appConfig.midiInDevice) == appConfig.midiInDeviceName
+MaybeOpenMidiInput() 
+{
+	
+	global appConfig, currentMidiInputDeviceIndex
+	
+	if ( appConfig.midiInDevice >= 0
+		; Open the MIDI input, if we don't have a "device name" stored, or if the stored device name matches the actual device name
+		and 
+		(
+			StrLen( appConfig.midiInDeviceName ) == 0
+			or GetMidiDeviceName( appConfig.midiInDevice ) == appConfig.midiInDeviceName
 		)
-	) {
-		OpenMidiInput(appConfig.midiInDevice, OnMidiData)
-		A_IconTip := "MIDI-Transport-to-Mute listening on MIDI device: " . GetMidiDeviceName( appConfig.midiInDevice )
+	) 
+	{
+		OpenMidiInput( appConfig.midiInDevice, OnMidiData )
+		A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( appConfig.midiInDevice )
+		A_TrayMenu.Rename( "3&", "Using MIDI device: " GetMidiDeviceName( appConfig.midiInDevice ) )
 		return true
 	}
+	
 	return false
-}
+	
+} ;;; END MaybeOpenMidiInput() 
+
+
+
+
+
+
 
 DummyNonExistentFunction(*) 
 {
@@ -38,7 +51,7 @@ Main()
 	
 	TraySetIcon "icon.ico"
 	
-	programName := "MIDI-Transport-to-Mute v1.1.0"
+	programName := "MIDI-Transport-to-Mute v1.1.1"
 	
 	A_IconTip := programName
 	
@@ -47,6 +60,12 @@ Main()
 	
 	A_TrayMenu.Add( programName, MenuHandlerTitle )
 	A_TrayMenu.Disable( programName )
+	A_TrayMenu.Add() ; Add a menu separator line
+	
+	A_TrayMenu.Add( "MIDI Port", MenuHandlerTitle )
+	A_TrayMenu.Disable( "3&" )
+	A_TrayMenu.Add( "Using audio input: MicInput", MenuHandlerTitle )
+	A_TrayMenu.Disable( "4&" )
 	A_TrayMenu.Add() ; Add a menu separator line
 	
 	A_TrayMenu.Add() ; Add a menu separator line

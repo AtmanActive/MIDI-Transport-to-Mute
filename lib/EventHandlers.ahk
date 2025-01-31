@@ -62,6 +62,7 @@ OnMidiInputChange( control, * )
 	deviceName := GetMidiDeviceName( deviceIndex )
 	WriteConfigMidiDevice( deviceIndex, deviceName )
 	AppendMidiOutputRow( "Device", deviceName )
+	A_TrayMenu.Rename( "3&", "Using MIDI device: " deviceName )
 }
 
 ToggleShowOnStartup(*) 
