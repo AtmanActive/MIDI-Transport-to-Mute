@@ -1,9 +1,9 @@
 #Requires AutoHotkey v2.0
 
 ; Callback from winmm.dll for any MIDI message
-OnMidiData( hInput, midiMessage, * ) 
+Fn_OnMidiData_1( hInput, midiMessage, * ) 
 {
-	global currentMidiInputDeviceIndex
+	global currentMidiInputDeviceIndex_1
 	
 	statusByte := midiMessage & 0xFF
 	channel := (statusByte & 0x0F) + 1
@@ -28,42 +28,125 @@ OnMidiData( hInput, midiMessage, * )
 		description := "PitchBend"
 	}
 	
-	AppendMidiInputRow( description, statusByte, channel, byte1, byte2 )
+	Fn_AppendMidiInputRow_1( description, statusByte, channel, byte1, byte2 )
 	
 	if ( statusByte >= 128 and statusByte <= 159 ) 
 	{
 		; Note off/on
 		isNoteOn := ( statusByte >= 144 and byte2 > 0 )
-		ProcessNote( currentMidiInputDeviceIndex, channel, byte1, byte2, isNoteOn )
+		Fn_ProcessNote_1( currentMidiInputDeviceIndex_1, channel, byte1, byte2, isNoteOn )
 	} 
 	else if ( statusByte >= 176 and statusByte <= 191 ) 
 	{ 
 		; CC
-		ProcessCC( currentMidiInputDeviceIndex, channel, byte1, byte2 )
+		ProcessCC( currentMidiInputDeviceIndex_1, channel, byte1, byte2 )
 	} 
 	else if ( statusByte >= 192 and statusByte <= 208 ) 
 	{ 
 		; PC
-		ProcessPC( currentMidiInputDeviceIndex, channel, byte1, byte2 )
+		ProcessPC( currentMidiInputDeviceIndex_1, channel, byte1, byte2 )
 	} 
 	else if ( statusByte >= 224 and statusByte <= 239 ) 
 	{ 
 		; Pitch bend
 		pitchBend := ( byte2 << 7 ) | byte1
-		ProcessPitchBend( currentMidiInputDeviceIndex, channel, pitchBend )
+		ProcessPitchBend( currentMidiInputDeviceIndex_1, channel, pitchBend )
 	}
-}
+
+} ;;; END Fn_OnMidiData_1
+
+
+
+
+
+
+
+
+
+; Callback from winmm.dll for any MIDI message
+Fn_OnMidiData_2( hInput, midiMessage, * ) 
+{
+	global currentMidiInputDeviceIndex_2
+	
+	statusByte := midiMessage & 0xFF
+	channel := (statusByte & 0x0F) + 1
+	byte1 := (midiMessage >> 8) & 0xFF	; Note/CC number
+	byte2 := (midiMessage >> 16) & 0xFF	; Note Velocity, or CC value
+
+	description := ""
+	if ( statusByte >= 128 and statusByte <= 143 ) 
+	{
+		description := "NoteOff"
+	} 
+	else if ( statusByte >= 144 and statusByte <= 159 ) 
+	{
+		description := "NoteOn"
+	} 
+	else if ( statusByte >= 176 and statusByte <= 191 ) 
+	{
+		description := "CC"
+	} 
+	else if ( statusByte >= 224 and statusByte <= 239 ) 
+	{
+		description := "PitchBend"
+	}
+	
+	Fn_AppendMidiInputRow_2( description, statusByte, channel, byte1, byte2 )
+	
+	if ( statusByte >= 128 and statusByte <= 159 ) 
+	{
+		; Note off/on
+		isNoteOn := ( statusByte >= 144 and byte2 > 0 )
+		ProcessNote( currentMidiInputDeviceIndex_2, channel, byte1, byte2, isNoteOn )
+	} 
+	else if ( statusByte >= 176 and statusByte <= 191 ) 
+	{ 
+		; CC
+		Fn_ProcessCC_2( currentMidiInputDeviceIndex_2, channel, byte1, byte2 )
+	} 
+	else if ( statusByte >= 192 and statusByte <= 208 ) 
+	{ 
+		; PC
+		ProcessPC( currentMidiInputDeviceIndex_2, channel, byte1, byte2 )
+	} 
+	else if ( statusByte >= 224 and statusByte <= 239 ) 
+	{ 
+		; Pitch bend
+		pitchBend := ( byte2 << 7 ) | byte1
+		ProcessPitchBend( currentMidiInputDeviceIndex_2, channel, pitchBend )
+	}
+
+} ;;; END Fn_OnMidiData_2
+
+
+
+
+
+
+
+
 
 ; Callback for the MIDI input dropdown list
-OnMidiInputChange( control, * ) 
+Fn_OnMidiInputChange_1( control, * ) 
 {
 	deviceIndex := control.Value - 1
-	OpenMidiInput( deviceIndex, OnMidiData )
+	Fn_OpenMidiInput_1( deviceIndex, Fn_OnMidiData_1 )
 	deviceName := GetMidiDeviceName( deviceIndex )
-	WriteConfigMidiDevice( deviceIndex, deviceName )
-	AppendMidiOutputRow( "Device", deviceName )
-	A_TrayMenu.Rename( "3&", "Using MIDI device: " deviceName )
+	WriteConfigMidiDevice_1( deviceIndex, deviceName )
+	Fn_AppendMidiOutputRow_1( "Device", deviceName )
+	A_TrayMenu.Rename( "3&", "Using MIDI device for Mute Signals: " deviceName )
 }
+
+Fn_OnMidiInputChange_2( control, * ) 
+{
+	deviceIndex := control.Value - 1
+	Fn_OpenMidiInput_2( deviceIndex, Fn_OnMidiData_2 )
+	deviceName := GetMidiDeviceName( deviceIndex )
+	WriteConfigMidiDevice_2( deviceIndex, deviceName )
+	Fn_AppendMidiOutputRow_2( "Device", deviceName )
+	A_TrayMenu.Rename( "4&", "Using MIDI device for Talkback Signals: " deviceName )
+}
+
 
 ToggleShowOnStartup(*) 
 {

@@ -10,48 +10,43 @@
 */
 
 
-ProcessNote( device, channel, note, velocity, isNoteOn ) 
+Fn_ProcessNote_1( device, channel, note, velocity, isNoteOn ) 
 {
 	
 	if ( channel = 1 and note = 93 and velocity = 127 )
 	{
-		PerformSoundInputUnMute()
+		Fn_PerformSoundInputUnMute()
 	}
 	
 	if ( channel = 1 and note = 94 and velocity = 127 )
 	{
-		PerformSoundInputMute()
+		Fn_PerformSoundInputMute()
 	}
 	
 }
 
-ProcessCC( device, channel, cc, value ) 
-{
 
-}
 
-ProcessPC( device, channel, note, velocity ) 
+Fn_PerformSoundInputMute()
 {
-	
-}
-
-ProcessPitchBend( device, channel, value ) 
-{
-	
-}
-
-PerformSoundInputMute()
-{
+	global is_muted_by_mackie_now
 	SoundSetMute 1, "", "MicInput"
-	DisplayOutput( "MicInput", "Muted" )
+	Fn_DisplayOutput_1( "MicInput", "Muted" )
 	TraySetIcon "icon_red.ico"
 	A_IconTip := "MIDI-Transport-to-Mute muted"
+	is_muted_by_mackie_now := true
+	A_TrayMenu.Enable( "17&" )
+	A_TrayMenu.Enable( "18&" )
 }
 
-PerformSoundInputUnMute()
+Fn_PerformSoundInputUnMute()
 {
+	global is_muted_by_mackie_now
 	SoundSetMute 0, "", "MicInput"
-	DisplayOutput( "MicInput", "Unmuted" )
+	Fn_DisplayOutput_1( "MicInput", "Unmuted" )
 	TraySetIcon "icon_green.ico"
 	A_IconTip := "MIDI-Transport-to-Mute unmuted"
+	is_muted_by_mackie_now := false
+	A_TrayMenu.Disable( "17&" )
+	A_TrayMenu.Disable( "18&" )
 }
