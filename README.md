@@ -25,7 +25,7 @@ In addition to muting/unmuting from MIDI signals coming from a DAW, you can now 
 This allows you to temporarily unmute your microphone by holding a button on your MIDI controller (studio style talkback).
 For this, a second MIDI port needs to be assigned as Talkback MIDI input, which will listen for **Control Change** messages on **channel** **14**, **CC# 14**, values **0** and **127**.
 
-With some clever MIDI routing, you could also configure your DAW to dim the audio output, thus creating a full studio style talkback experience.
+With some [clever MIDI routing](https://github.com/AtmanActive/MIDI-Transport-to-Mute/tree/45952bb24ad2d2bb1b1718d0d61ed2cd4fd3cd0e/Extras/Reaper), you could also configure your DAW to dim the audio output, thus creating a full studio style talkback experience.
 
 Please note: talkback events will be ignored when the DAW is not playing (when this program considers the microphone unmuted), as it only makes sense to briefly defeat mute state while playing/recording (when local microphone is actually muted).
 
