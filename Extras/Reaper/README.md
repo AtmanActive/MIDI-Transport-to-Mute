@@ -14,4 +14,4 @@ The other piece of the puzzle is [ReaLearn](https://www.helgoboss.org/projects/r
 
 Once you have ReaLearn installed in your Reaper, add a ReaLearn instance to your Monitoring FX and import the file [ReaLearn TalkBack Instance.json](https://raw.githubusercontent.com/AtmanActive/MIDI-Transport-to-Mute/refs/heads/main/Extras/Reaper/ReaLearn%20TalkBack%20Instance.json) from this repository into it.
 
-The ReaLearn configuration is set to receive MIDI messages from MIDI-Transport-to-Mute.exe and to automate monitoring_fx_talkback_dimmer to lower the volume while talkback is active and to bring it back to unity gain when talkback is inactive.
+The ReaLearn configuration is set to receive [MIDI messages](https://github.com/AtmanActive/MIDI-Transport-to-Mute/blob/45952bb24ad2d2bb1b1718d0d61ed2cd4fd3cd0e/lib/MidiRulesExecTalkback.ahk#L18) from MIDI-Transport-to-Mute.exe and to automate monitoring_fx_talkback_dimmer to lower the volume while talkback is active and to bring it back to unity gain when talkback is inactive.
