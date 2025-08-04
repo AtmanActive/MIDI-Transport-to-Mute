@@ -12,6 +12,6 @@ The name of the file is [monitoring_fx_talkback_dimmer](https://raw.githubuserco
 
 The other piece of the puzzle is [ReaLearn](https://www.helgoboss.org/projects/realearn) which is a plug-in for Reaper to enable system-wide automation.
 
-Once you have ReaLearn installed in your Reaper, add a ReaLearn instance to your Monitoring FX and import the file ReaLearn TalkBack Instance.json from this repository into it.
+Once you have ReaLearn installed in your Reaper, add a ReaLearn instance to your Monitoring FX and import the file [ReaLearn TalkBack Instance.json](https://raw.githubusercontent.com/AtmanActive/MIDI-Transport-to-Mute/refs/heads/main/Extras/Reaper/ReaLearn%20TalkBack%20Instance.json) from this repository into it.
 
 The ReaLearn configuration is set to receive MIDI messages from MIDI-Transport-to-Mute.exe and to automate monitoring_fx_talkback_dimmer to lower the volume while talkback is active and to bring it back to unity gain when talkback is inactive.
