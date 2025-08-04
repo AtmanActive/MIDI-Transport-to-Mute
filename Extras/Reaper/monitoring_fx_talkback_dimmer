@@ -1,0 +1,77 @@
+// This effect Copyright (C) 2004 and later Cockos Incorporated
+// License: LGPL - http://www.gnu.org/licenses/lgpl.html
+
+desc: monitoring_fx_talkback_dimmer
+//tags: utility gain
+//author: Cockos, modified by AtmanActive 2025
+
+slider1:0<-150,0,1>Dim Level (dB)
+
+in_pin:left input
+in_pin:right input
+out_pin:left output
+out_pin:right output
+
+@init
+ext_tail_size = -2;
+last_play_state = -1; // Initialize to invalid state
+
+@slider
+  adj1=2 ^ (slider1/6); 
+  doseek < 0 ? doseek = 1;
+
+@block
+// Check for transport state change
+play_state != last_play_state ? (
+  slider1 = 0; // Reset to 0dB
+  slider_automate(slider1); // Update the slider UI
+  adj1 = 1; // Unity gain (2^0 = 1)
+  last_play_state = play_state;
+);
+
+doseek > 0 ? (
+  dadj=(adj1-adj1_s)/samplesblock;
+):(
+  dadj=0;
+  adj1_s=adj1;
+);
+doseek = -1;
+
+@sample
+spl0=spl0*adj1_s;
+spl1=spl1*adj1_s;
+adj1_s+=dadj;
+
+@gfx 400 200
+// Set text color (white)
+gfx_set(1, 1, 1);
+gfx_setfont(1, "Helvetica", 16);
+
+// Position and draw static text
+gfx_x = 10;
+gfx_y = 10;
+gfx_drawstr("This plugin was designed to be used on the");
+gfx_x = 10;
+gfx_y = 24;
+gfx_drawstr("Monitoring FX chain in conjuction with ReaLearn (Helgobox).");
+
+// Draw additional info
+gfx_x = 10;
+gfx_y = 38;
+gfx_drawstr("ReaLearn provides MIDI-to-dim-level automation,");
+gfx_x = 10;
+gfx_y = 52;
+gfx_drawstr("but this plugin resets to 0dB on transport change anyway, as a failsafe.");
+
+// Show current transport state
+gfx_x = 10;
+gfx_y = 70;
+gfx_drawstr("Transport: ");
+play_state ? gfx_drawstr("PLAYING") : gfx_drawstr("STOPPED");
+
+// Show current gain
+gfx_x = 10;
+gfx_y = 90;
+gfx_drawstr("Current gain: ");
+gfx_drawnumber(slider1, 1);
+gfx_drawstr(" dB");

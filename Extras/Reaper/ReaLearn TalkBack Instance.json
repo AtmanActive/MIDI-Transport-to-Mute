@@ -1,0 +1,86 @@
+{
+  "kind": "Instance",
+  "version": "2.17.2",
+  "value": {
+    "mainUnit": {
+      "version": "2.17.2",
+      "id": "xn2fiTp0",
+      "name": "Main",
+      "stayActiveWhenProjectInBackground": "OnlyIfBackgroundProjectIsRunning",
+      "livesOnUpperFloor": false,
+      "controlDeviceId": "28",
+      "defaultGroup": {},
+      "defaultControllerGroup": {},
+      "mappings": [
+        {
+          "id": "cGmMyf4fF9jNltMQ9bSn5",
+          "name": "Talkback Engage",
+          "source": {
+            "channel": 13,
+            "number": 14,
+            "character": 1,
+            "isRegistered": false,
+            "is14Bit": false,
+            "oscArgIndex": 0,
+            "buttonIndex": 0,
+            "buttonDesign": {
+              "background": {
+                "kind": "Color"
+              },
+              "foreground": {
+                "kind": "None"
+              },
+              "static_text": ""
+            }
+          },
+          "mode": {
+            "minTargetValue": 0.44,
+            "maxTargetValue": 0.5,
+            "maxStepSize": 0.05,
+            "minStepFactor": 1,
+            "maxStepFactor": 5,
+            "reverseIsEnabled": true
+          },
+          "target": {
+            "commandName": "41882",
+            "invocationType": 0,
+            "fxAnchor": "id",
+            "fxIndex": 3,
+            "fxGUID": "2765072F-A70E-4528-BC3F-358C158E5095",
+            "isInputFx": true,
+            "useSelectionGanging": false,
+            "useTrackGrouping": false,
+            "seekBehavior": "Immediate",
+            "useProject": true,
+            "moveView": true,
+            "seekPlay": true,
+            "oscArgIndex": 0,
+            "mouseAction": {
+              "kind": "MoveTo",
+              "axis": "X"
+            },
+            "pollForFeedback": false,
+            "takeMappingSnapshot": {
+              "kind": "LastLoaded"
+            }
+          },
+          "feedbackIsEnabled": false
+        }
+      ],
+      "instanceFx": {
+        "address": "ById",
+        "fx_must_have_focus": false,
+        "chain": {
+          "address": "Track",
+          "track": {
+            "address": "This",
+            "track_must_be_selected": false
+          },
+          "chain": "Input"
+        },
+        "id": "2765072F-A70E-4528-BC3F-358C158E5095"
+      }
+    },
+    "additionalUnits": []
+  }
+}
