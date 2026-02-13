@@ -135,8 +135,13 @@ Fn_ShowMidiMonitor_1(*)
 	; Set column sizes for the output list view
 	lvOutEvents_1.ModifyCol( 1, 105 )
 	lvOutEvents_1.ModifyCol( 2, 110 )
-	; Show the GUI
-	midiMonitor_1.Show( "AutoSize xCenter Y5" )
+	; Show the GUI centered on screen
+	midiMonitor_1.Show( "AutoSize" )
+	midiMonitor_1.GetPos( , , &winW, &winH )
+	MonitorGetWorkArea( , &waLeft, &waTop, &waRight, &waBottom )
+	xPos := waLeft + ( ( waRight - waLeft - winW ) // 2 )
+	yPos := waTop + ( ( waBottom - waTop - winH ) // 2 )
+	midiMonitor_1.Show( "x" xPos " y" yPos )
 
 } ;;; END Fn_ShowMidiMonitor_1
 
@@ -188,8 +193,13 @@ Fn_ShowMidiMonitor_2(*)
 	; Set column sizes for the output list view
 	lvOutEvents_2.ModifyCol( 1, 105 )
 	lvOutEvents_2.ModifyCol( 2, 110 )
-	; Show the GUI
-	midiMonitor_2.Show( "AutoSize xCenter Y5" )
+	; Show the GUI centered on screen
+	midiMonitor_2.Show( "AutoSize" )
+	midiMonitor_2.GetPos( , , &winW, &winH )
+	MonitorGetWorkArea( , &waLeft, &waTop, &waRight, &waBottom )
+	xPos := waLeft + ( ( waRight - waLeft - winW ) // 2 )
+	yPos := waTop + ( ( waBottom - waTop - winH ) // 2 )
+	midiMonitor_2.Show( "x" xPos " y" yPos )
 
 } ;;; END Fn_ShowMidiMonitor_2
 

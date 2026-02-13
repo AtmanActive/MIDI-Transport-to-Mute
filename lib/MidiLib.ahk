@@ -61,6 +61,20 @@ GetMidiDeviceName( deviceIndex )
 
 
 
+FindMidiInputIndexByName( targetName )
+{
+	numPorts := DllCall( "winmm.dll\midiInGetNumDevs" )
+	Loop numPorts
+	{
+		portName := GetMidiDeviceName( A_Index - 1 )
+		if ( IsSet( portName ) and portName == targetName )
+		{
+			return A_Index - 1
+		}
+	}
+	return -1
+} ;;; END FindMidiInputIndexByName()
+
 
 Fn_LoadMidiInputs() 
 {

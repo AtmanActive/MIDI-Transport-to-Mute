@@ -9,63 +9,85 @@ Persistent()
 ; The program controls microphone mute states using incoming MIDI signals.
 ; Includes features to show/hide the MIDI monitor and configure startup behavior.
 
-; v2.0.0
+; v2.0.1
 
 
 global is_muted_by_mackie_now := false
 
 
-Fn_MaybeOpenMidiInput_1() 
+Fn_MaybeOpenMidiInput_1()
 {
-	
+
 	global appConfig, currentMidiInputDeviceIndex_1, currentMidiInputDeviceIndex_2
-	
-	if ( appConfig.MIDI_input_Mackie_Mute_Number >= 0
-		; Open the MIDI input, if we don't have a "device name" stored, or if the stored device name matches the actual device name
-		and 
-		(
-			StrLen( appConfig.MIDI_input_Mackie_Mute_Name ) == 0
-			or GetMidiDeviceName( appConfig.MIDI_input_Mackie_Mute_Number ) == appConfig.MIDI_input_Mackie_Mute_Name
-		)
-	)
+
+	if ( appConfig.MIDI_input_Mackie_Mute_Number < 0 )
 	{
-		Fn_OpenMidiInput_1( appConfig.MIDI_input_Mackie_Mute_Number, Fn_OnMidiData_1 )
-		A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( appConfig.MIDI_input_Mackie_Mute_Number )
-		A_TrayMenu.Rename( "3&", "Using MIDI device for Mute Signals: " GetMidiDeviceName( appConfig.MIDI_input_Mackie_Mute_Number ) )
-		return true
+		return false
 	}
-	
-	return false
-	
-} ;;; END Fn_MaybeOpenMidiInput_1() 
+
+	resolvedIndex := appConfig.MIDI_input_Mackie_Mute_Number
+
+	; If we have a stored name, verify it still matches the device at the saved index
+	if ( StrLen( appConfig.MIDI_input_Mackie_Mute_Name ) > 0
+		and GetMidiDeviceName( resolvedIndex ) !== appConfig.MIDI_input_Mackie_Mute_Name )
+	{
+		; Name mismatch — Windows re-enumerated ports. Search by name.
+		resolvedIndex := FindMidiInputIndexByName( appConfig.MIDI_input_Mackie_Mute_Name )
+
+		if ( resolvedIndex < 0 )
+		{
+			return false
+		}
+
+		; Update the INI with the new index so next startup is fast
+		WriteConfigMidiDevice_1( resolvedIndex, appConfig.MIDI_input_Mackie_Mute_Name )
+	}
+
+	Fn_OpenMidiInput_1( resolvedIndex, Fn_OnMidiData_1 )
+	A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( resolvedIndex )
+	A_TrayMenu.Rename( "3&", "Using MIDI device for Mute Signals: " GetMidiDeviceName( resolvedIndex ) )
+	return true
+
+} ;;; END Fn_MaybeOpenMidiInput_1()
 
 
 
 
 
-Fn_MaybeOpenMidiInput_2() 
+Fn_MaybeOpenMidiInput_2()
 {
-	
+
 	global appConfig, currentMidiInputDeviceIndex_2, currentMidiInputDeviceIndex_2
-	
-	if ( appConfig.MIDI_input_Talkback_Hold_Number >= 0
-		; Open the MIDI input, if we don't have a "device name" stored, or if the stored device name matches the actual device name
-		and 
-		(
-			StrLen( appConfig.MIDI_input_Talkback_Hold_Name ) == 0
-			or GetMidiDeviceName( appConfig.MIDI_input_Talkback_Hold_Number ) == appConfig.MIDI_input_Talkback_Hold_Name
-		)
-	) 
+
+	if ( appConfig.MIDI_input_Talkback_Hold_Number < 0 )
 	{
-		Fn_OpenMidiInput_2( appConfig.MIDI_input_Talkback_Hold_Number, Fn_OnMidiData_2 )
-		A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( appConfig.MIDI_input_Talkback_Hold_Number )
-		A_TrayMenu.Rename( "4&", "Using MIDI device for Talkback Signals: " GetMidiDeviceName( appConfig.MIDI_input_Talkback_Hold_Number ) )
-		return true
+		return false
 	}
-	
-	return false
-	
-} ;;; END Fn_MaybeOpenMidiInput_2() 
+
+	resolvedIndex := appConfig.MIDI_input_Talkback_Hold_Number
+
+	; If we have a stored name, verify it still matches the device at the saved index
+	if ( StrLen( appConfig.MIDI_input_Talkback_Hold_Name ) > 0
+		and GetMidiDeviceName( resolvedIndex ) !== appConfig.MIDI_input_Talkback_Hold_Name )
+	{
+		; Name mismatch — Windows re-enumerated ports. Search by name.
+		resolvedIndex := FindMidiInputIndexByName( appConfig.MIDI_input_Talkback_Hold_Name )
+
+		if ( resolvedIndex < 0 )
+		{
+			return false
+		}
+
+		; Update the INI with the new index so next startup is fast
+		WriteConfigMidiDevice_2( resolvedIndex, appConfig.MIDI_input_Talkback_Hold_Name )
+	}
+
+	Fn_OpenMidiInput_2( resolvedIndex, Fn_OnMidiData_2 )
+	A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( resolvedIndex )
+	A_TrayMenu.Rename( "4&", "Using MIDI device for Talkback Signals: " GetMidiDeviceName( resolvedIndex ) )
+	return true
+
+} ;;; END Fn_MaybeOpenMidiInput_2()
 
 
 
@@ -86,7 +108,7 @@ Main()
 	
 	TraySetIcon "icon.ico"
 	
-	programName := "MIDI-Transport-to-Mute v2.0.0"
+	programName := "MIDI-Transport-to-Mute v2.0.1"
 	
 	A_IconTip := programName
 	
