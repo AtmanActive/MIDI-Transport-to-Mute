@@ -9,10 +9,11 @@ Persistent()
 ; The program controls microphone mute states using incoming MIDI signals.
 ; Includes features to show/hide the MIDI monitor and configure startup behavior.
 
-; v2.0.2
+; v2.0.3
 
 
 global is_muted_by_mackie_now := false
+global menuStatus, menuConfig, menuTest
 
 
 Fn_MaybeOpenMidiInput_1()
@@ -52,7 +53,7 @@ Fn_MaybeOpenMidiInput_1()
 
 	Fn_OpenMidiInput_1( resolvedIndex, Fn_OnMidiData_1 )
 	A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( resolvedIndex )
-	A_TrayMenu.Rename( "3&", "Using MIDI device for Mute Signals: " GetMidiDeviceName( resolvedIndex ) )
+	menuStatus.Rename( "1&", "Using MIDI device for Mute Signals: " GetMidiDeviceName( resolvedIndex ) )
 	return true
 
 } ;;; END Fn_MaybeOpenMidiInput_1()
@@ -98,7 +99,7 @@ Fn_MaybeOpenMidiInput_2()
 
 	Fn_OpenMidiInput_2( resolvedIndex, Fn_OnMidiData_2 )
 	A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( resolvedIndex )
-	A_TrayMenu.Rename( "4&", "Using MIDI device for Talkback Signals: " GetMidiDeviceName( resolvedIndex ) )
+	menuStatus.Rename( "2&", "Using MIDI device for Talkback Signals: " GetMidiDeviceName( resolvedIndex ) )
 	return true
 
 } ;;; END Fn_MaybeOpenMidiInput_2()
@@ -116,54 +117,57 @@ DummyNonExistentFunction(*)
 
 Main() 
 {
-	global appConfig, currentMidiInputDeviceIndex_1, currentMidiInputDeviceIndex_2
-	
+	global appConfig, currentMidiInputDeviceIndex_1, currentMidiInputDeviceIndex_2, menuStatus, menuConfig, menuTest
+
 	OnExit( Fn_CloseMidiInputs )
 	
 	TraySetIcon "icon.ico"
 	
-	programName := "MIDI-Transport-to-Mute v2.0.2"
+	programName := "MIDI-Transport-to-Mute v2.0.3"
 	
 	A_IconTip := programName
 	
 	; Remove all standard menu items
 	A_TrayMenu.Delete()
-	
-	A_TrayMenu.Add( programName, MenuHandlerTitle ) ; 1
+
+	; Status submenu — informational items
+	menuStatus := Menu()
+	menuStatus.Add( "MIDI Port for Mute Signals", MenuHandlerTitle )
+	menuStatus.Disable( "MIDI Port for Mute Signals" )
+	menuStatus.Add( "MIDI Port for Talkback Signals", MenuHandlerTitle )
+	menuStatus.Disable( "MIDI Port for Talkback Signals" )
+	menuStatus.Add( "Using audio input: MicInput", MenuHandlerTitle )
+	menuStatus.Disable( "Using audio input: MicInput" )
+
+	; Config submenu — monitors and settings
+	menuConfig := Menu()
+	menuConfig.Add( "Open MIDI Monitor for Mute Signals MIDI Port", Fn_ShowMidiMonitor_1 )
+	menuConfig.Add( "Open MIDI Monitor for Talkback Signals MIDI Port", Fn_ShowMidiMonitor_2 )
+	menuConfig.Add( "Show MIDI Monitor on Startup", ToggleShowOnStartup )
+	menuConfig.Add()
+	menuConfig.Add( "Rename your default audio input device to MicInput", MenuHandlerMicRename )
+
+	; Test submenu — manual mute/talkback actions
+	menuTest := Menu()
+	menuTest.Add( "Mute Microphone now", MenuHandlerMuteNow )
+	menuTest.Add( "Unmute Microphone now", MenuHandlerUnMuteNow )
+	menuTest.Add()
+	menuTest.Add( "Engage Talkback now", MenuHandlerTalkbackOnNow )
+	menuTest.Add( "Disengage Talkback now", MenuHandlerTalkbackOffNow )
+	menuTest.Disable( "Engage Talkback now" )
+	menuTest.Disable( "Disengage Talkback now" )
+
+	; Top-level tray menu
+	A_TrayMenu.Add( programName, MenuHandlerTitle )
 	A_TrayMenu.Disable( programName )
-	A_TrayMenu.Add() ; Add a menu separator line - 2
-	
-	A_TrayMenu.Add( "MIDI Port for Mute Signals", MenuHandlerTitle ) ; 3
-	A_TrayMenu.Disable( "3&" )
-	A_TrayMenu.Add( "MIDI Port for Talkback Signals", MenuHandlerTitle ) ; 4
-	A_TrayMenu.Disable( "4&" )
-	A_TrayMenu.Add( "Using audio input: MicInput", MenuHandlerTitle ) ; 5
-	A_TrayMenu.Disable( "5&" )
-	A_TrayMenu.Add() ; Add a menu separator line - 6
-	
-	A_TrayMenu.Add() ; Add a menu separator line - 7
-	A_TrayMenu.Add( "Open MIDI Monitor for Mute Signals MIDI Port", Fn_ShowMidiMonitor_1 ) ; 8
-	A_TrayMenu.Add( "Open MIDI Monitor for Talkback Signals MIDI Port", Fn_ShowMidiMonitor_2 ) ; 9
-	A_TrayMenu.Add( "Show MIDI Monitor on Startup", ToggleShowOnStartup ) ; 10
-	
-	A_TrayMenu.Add() ; Add a menu separator line - 11
-	A_TrayMenu.Add( "Rename your default audio input device to MicInput", MenuHandlerMicRename ) ; 12
-	
-	A_TrayMenu.Add()  ; Creates a separator line - 13
-	A_TrayMenu.Add( "Mute Microphone now", MenuHandlerMuteNow ) ; 14
-	A_TrayMenu.Add( "Unmute Microphone now", MenuHandlerUnMuteNow ) ; 15
-	
-	A_TrayMenu.Add()  ; Creates a separator line - 16
-	A_TrayMenu.Add( "Engage Talkback now", MenuHandlerTalkbackOnNow ) ; 17
-	A_TrayMenu.Add( "Disengage Talkback now", MenuHandlerTalkbackOffNow ) ; 18
-	A_TrayMenu.Disable( "17&" )
-	A_TrayMenu.Disable( "18&" )
-	
-	A_TrayMenu.Add()  ; Creates a separator line - 19
-	A_TrayMenu.Add( "About", MenuHandlerAbout ) ; 20
-	
-	A_TrayMenu.Add()  ; Creates a separator line - 21
-	A_TrayMenu.Add( "Exit", MenuHandlerExit ) ; 22
+	A_TrayMenu.Add()
+	A_TrayMenu.Add( "Status", menuStatus )
+	A_TrayMenu.Add( "Config", menuConfig )
+	A_TrayMenu.Add( "Test", menuTest )
+	A_TrayMenu.Add()
+	A_TrayMenu.Add( "About", MenuHandlerAbout )
+	A_TrayMenu.Add()
+	A_TrayMenu.Add( "Exit", MenuHandlerExit )
 	
 	ReadConfig()
 	wasMidiOpened_1 := Fn_MaybeOpenMidiInput_1()
@@ -171,11 +175,11 @@ Main()
 	
 	if ( appConfig.showOnStartup ) 
 	{
-		A_TrayMenu.Check( "Show MIDI Monitor on Startup" )
+		menuConfig.Check( "Show MIDI Monitor on Startup" )
 	} 
 	else 
 	{
-		A_TrayMenu.Uncheck( "Show MIDI Monitor on Startup" )
+		menuConfig.Uncheck( "Show MIDI Monitor on Startup" )
 	}
 
 	if ( ! wasMidiOpened_1 || appConfig.showOnStartup ) 
@@ -195,7 +199,7 @@ Main()
 	
 	MenuHandlerAbout( ItemName, ItemPos, MyMenu ) 
 	{
-		Result := MsgBox( programName "`n`n`n`nThe purpose of this program is to mute/unmute the windows audio input named MicInput according to incoming MIDI signals for Mackie Stop and Play (A6 & A#6)[093 & 094]{0x5D & 0x5E}. In addition, a second MIDI port can be used for Talkback events via CC#14 on channel 14, values 0 and 127.  `n`nThis is useful in an online music recording studio session where all participants can be muted on DAW play and unmuted on DAW stop.`n`nDeveloped by AtmanActive, 2024, 2025. `n`n`n`nWould you like to open the home page?",, "YesNo")
+		Result := MsgBox( programName "`n`n`n`nThe purpose of this program is to mute/unmute the windows audio input named MicInput according to incoming MIDI signals for Mackie Stop and Play (A6 & A#6)[093 & 094]{0x5D & 0x5E}. In addition, a second MIDI port can be used for Talkback events via CC#14 on channel 14, values 0 and 127.  `n`nThis is useful in an online music recording studio session where all participants can be muted on DAW play and unmuted on DAW stop.`n`nDeveloped by AtmanActive, 2024, 2025, 2026. `n`n`n`nWould you like to open the home page?",, "YesNo")
 		if ( Result = "Yes" )
 		{
 			Run( "https://github.com/AtmanActive/MIDI-Transport-to-Mute" )

@@ -35,8 +35,8 @@ Fn_PerformSoundInputMute()
 	TraySetIcon "icon_red.ico"
 	A_IconTip := "MIDI-Transport-to-Mute muted"
 	is_muted_by_mackie_now := true
-	A_TrayMenu.Enable( "17&" )
-	A_TrayMenu.Enable( "18&" )
+	menuTest.Enable( "Engage Talkback now" )
+	menuTest.Enable( "Disengage Talkback now" )
 }
 
 Fn_PerformSoundInputUnMute()
@@ -47,6 +47,6 @@ Fn_PerformSoundInputUnMute()
 	TraySetIcon "icon_green.ico"
 	A_IconTip := "MIDI-Transport-to-Mute unmuted"
 	is_muted_by_mackie_now := false
-	A_TrayMenu.Disable( "17&" )
-	A_TrayMenu.Disable( "18&" )
+	menuTest.Disable( "Engage Talkback now" )
+	menuTest.Disable( "Disengage Talkback now" )
 }

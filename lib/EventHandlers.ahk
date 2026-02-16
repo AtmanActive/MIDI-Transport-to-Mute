@@ -143,7 +143,7 @@ Fn_OnMidiInputChange_1( control, * )
 	deviceName := GetMidiDeviceName( deviceIndex )
 	WriteConfigMidiDevice_1( deviceIndex, deviceName )
 	Fn_AppendMidiOutputRow_1( "Device", deviceName )
-	A_TrayMenu.Rename( "3&", "Using MIDI device for Mute Signals: " deviceName )
+	menuStatus.Rename( "1&", "Using MIDI device for Mute Signals: " deviceName )
 }
 
 Fn_OnMidiInputChange_2( control, * )
@@ -162,12 +162,12 @@ Fn_OnMidiInputChange_2( control, * )
 	deviceName := GetMidiDeviceName( deviceIndex )
 	WriteConfigMidiDevice_2( deviceIndex, deviceName )
 	Fn_AppendMidiOutputRow_2( "Device", deviceName )
-	A_TrayMenu.Rename( "4&", "Using MIDI device for Talkback Signals: " deviceName )
+	menuStatus.Rename( "2&", "Using MIDI device for Talkback Signals: " deviceName )
 }
 
 
 ToggleShowOnStartup(*) 
 {
 	WriteConfigShowOnStartup( ! appConfig.showOnStartup )
-	A_TrayMenu.ToggleCheck( "Show MIDI Monitor on Startup" )
+	menuConfig.ToggleCheck( "Show MIDI Monitor on Startup" )
 }
