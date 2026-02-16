@@ -127,9 +127,18 @@ Fn_OnMidiData_2( hInput, midiMessage, * )
 
 
 ; Callback for the MIDI input dropdown list
-Fn_OnMidiInputChange_1( control, * ) 
+Fn_OnMidiInputChange_1( control, * )
 {
+	global currentMidiInputDeviceIndex_1, currentMidiInputDeviceIndex_2
 	deviceIndex := control.Value - 1
+
+	if ( IsSet( currentMidiInputDeviceIndex_2 ) and deviceIndex == currentMidiInputDeviceIndex_2 )
+	{
+		Fn_WarnDuplicateMidiPort()
+		control.Value := IsSet( currentMidiInputDeviceIndex_1 ) ? currentMidiInputDeviceIndex_1 + 1 : 0
+		return
+	}
+
 	Fn_OpenMidiInput_1( deviceIndex, Fn_OnMidiData_1 )
 	deviceName := GetMidiDeviceName( deviceIndex )
 	WriteConfigMidiDevice_1( deviceIndex, deviceName )
@@ -137,9 +146,18 @@ Fn_OnMidiInputChange_1( control, * )
 	A_TrayMenu.Rename( "3&", "Using MIDI device for Mute Signals: " deviceName )
 }
 
-Fn_OnMidiInputChange_2( control, * ) 
+Fn_OnMidiInputChange_2( control, * )
 {
+	global currentMidiInputDeviceIndex_1, currentMidiInputDeviceIndex_2
 	deviceIndex := control.Value - 1
+
+	if ( IsSet( currentMidiInputDeviceIndex_1 ) and deviceIndex == currentMidiInputDeviceIndex_1 )
+	{
+		Fn_WarnDuplicateMidiPort()
+		control.Value := IsSet( currentMidiInputDeviceIndex_2 ) ? currentMidiInputDeviceIndex_2 + 1 : 0
+		return
+	}
+
 	Fn_OpenMidiInput_2( deviceIndex, Fn_OnMidiData_2 )
 	deviceName := GetMidiDeviceName( deviceIndex )
 	WriteConfigMidiDevice_2( deviceIndex, deviceName )

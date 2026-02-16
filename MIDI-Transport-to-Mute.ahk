@@ -9,7 +9,7 @@ Persistent()
 ; The program controls microphone mute states using incoming MIDI signals.
 ; Includes features to show/hide the MIDI monitor and configure startup behavior.
 
-; v2.0.1
+; v2.0.2
 
 
 global is_muted_by_mackie_now := false
@@ -41,6 +41,13 @@ Fn_MaybeOpenMidiInput_1()
 
 		; Update the INI with the new index so next startup is fast
 		WriteConfigMidiDevice_1( resolvedIndex, appConfig.MIDI_input_Mackie_Mute_Name )
+	}
+
+	; Prevent opening the same port already used by the other input
+	if ( IsSet( currentMidiInputDeviceIndex_2 ) and resolvedIndex == currentMidiInputDeviceIndex_2 )
+	{
+		Fn_WarnDuplicateMidiPort()
+		return false
 	}
 
 	Fn_OpenMidiInput_1( resolvedIndex, Fn_OnMidiData_1 )
@@ -82,6 +89,13 @@ Fn_MaybeOpenMidiInput_2()
 		WriteConfigMidiDevice_2( resolvedIndex, appConfig.MIDI_input_Talkback_Hold_Name )
 	}
 
+	; Prevent opening the same port already used by the other input
+	if ( IsSet( currentMidiInputDeviceIndex_1 ) and resolvedIndex == currentMidiInputDeviceIndex_1 )
+	{
+		Fn_WarnDuplicateMidiPort()
+		return false
+	}
+
 	Fn_OpenMidiInput_2( resolvedIndex, Fn_OnMidiData_2 )
 	A_IconTip := "MIDI-Transport-to-Mute, input audio device MicInput, listening on MIDI device: " . GetMidiDeviceName( resolvedIndex )
 	A_TrayMenu.Rename( "4&", "Using MIDI device for Talkback Signals: " GetMidiDeviceName( resolvedIndex ) )
@@ -108,7 +122,7 @@ Main()
 	
 	TraySetIcon "icon.ico"
 	
-	programName := "MIDI-Transport-to-Mute v2.0.1"
+	programName := "MIDI-Transport-to-Mute v2.0.2"
 	
 	A_IconTip := programName
 	
